@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details</title>
+</head>
+<body>
+
+    <h2>{{ task.title }}</h2>
+    
+    <p><strong>Assigned User:</strong> {{ task.user.username }}</p>
+    <p><strong>Description:</strong> {{ task.description }}</p>
+    <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+    <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+    <p><strong>Created At:</strong> {{ task.created_at }}</p>
+
+    <!-- Form to update task status and priority -->
+    <form method="post" action="{% url 'update_task' task.id %}">
+        {% csrf_token %}
+        
+        <label for="status"><strong>Update Status:</strong></label>
+        <select name="status" id="status">
+            <option value="pending" {% if task.status == "pending" %}selected{% endif %}>Pending</option>
+            <option value="completed" {% if task.status == "completed" %}selected{% endif %}>Completed</option>
+        </select>
+
+        <label for="priority"><strong>Update Priority:</strong></label>
+        <select name="priority" id="priority">
+            <option value="low" {% if task.priority == "low" %}selected{% endif %}>Low</option>
+            <option value="medium" {% if task.priority == "medium" %}selected{% endif %}>Medium</option>
+            <option value="high" {% if task.priority == "high" %}selected{% endif %}>High</option>
+        </select>
+
+        <button type="submit">Update Task</button>
+    </form>
+
+    <br>
+    <a href="{% url 'task-list' %}">Back to Task List</a>
+
+</body>
+</html>
