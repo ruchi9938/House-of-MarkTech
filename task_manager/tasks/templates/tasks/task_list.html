@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h2>Task Management</h2>
+
+    <!-- Task Form -->
+    <!-- <form id="taskForm">
+        <input type="text" id="title" placeholder="Task Title" required>
+        <input type="text" id="description" placeholder="Description" required>
+        <select id="priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+        </select>
+        <button type="submit">Create Task</button>
+    </form> -->
+
+    <!-- Task List -->
+    <h3>Task List</h3>
+    <ul id="taskList">
+        <h2>Task List</h2>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a> - {{ task.due_date }}
+                </li>
+            {% empty %}
+                <li>No tasks available.</li>
+            {% endfor %}
+        </ul>
+        
+    </ul>
+
+    <script>
+        $(document).ready(function() {
+            $("#taskForm").submit(function(event) {
+                event.preventDefault();
+                let taskData = {
+                    title: $("#title").val(),
+                    description: $("#description").val(),
+                    priority: $("#priority").val(),
+                    status: "pending"
+                };
+
+                $.ajax({
+                    url: "/api/tasks/",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(taskData),
+                    success: function(response) {
+                        $("#taskList").append(`<li data-id="${response.id}">
+                            ${response.title} - ${response.priority} - ${response.status}
+                            <button class="editTask">Edit</button>
+                        </li>`);
+                        $("#taskForm")[0].reset();
+                    }
+                });
+            });
+
+            $(document).on("click", ".editTask", function() {
+                let taskId = $(this).parent().data("id");
+                let newTitle = prompt("Enter new title:");
+                if (newTitle) {
+                    $.ajax({
+                        url: `/api/tasks/${taskId}/`,
+                        type: "PATCH",
+                        contentType: "application/json",
+                        data: JSON.stringify({ title: newTitle }),
+                        success: function(response) {
+                            $(`li[data-id='${taskId}']`).html(`${response.title} - ${response.priority} - ${response.status}
+                                <button class="editTask">Edit</button>`);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
